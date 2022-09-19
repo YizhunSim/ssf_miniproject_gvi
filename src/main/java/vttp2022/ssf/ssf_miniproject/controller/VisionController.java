@@ -1,47 +1,165 @@
 package vttp2022.ssf.ssf_miniproject.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gcp.vision.CloudVisionTemplate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.cloud.vision.v1.EntityAnnotation;
+import com.google.cloud.vision.v1.FaceAnnotation;
 import com.google.cloud.vision.v1.Feature;
 
-@RestController
-@RequestMapping(value = "/api")
+import vttp2022.ssf.ssf_miniproject.FileUploadUtil;
+import vttp2022.ssf.ssf_miniproject.models.User;
+import vttp2022.ssf.ssf_miniproject.services.UserService;
+
+@Controller
 public class VisionController {
+  public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
   @Autowired
   private ResourceLoader resourceLoader;
 
   @Autowired
   private CloudVisionTemplate cloudVisionTemplate;
 
-  @GetMapping("/getLabelDetection")
-	public String getLabelDetection() {
-		String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Lion_d%27Afrique.jpg/290px-Lion_d%27Afrique.jpg";
-		Resource imageResource = this.resourceLoader.getResource(imageUrl);
-		AnnotateImageResponse response = this.cloudVisionTemplate.analyzeImage(imageResource,
-				Feature.Type.LABEL_DETECTION);
-		return response.getLabelAnnotationsList().toString();
-	}
+  @Autowired
+  private UserService userService;
 
-  @GetMapping("/getLandmarkDetection")
-	public String getLandmarkDetection() {
-		String imageUrl = "https://www.parisinfo.com/var/otcp/sites/images/node_43/node_51/node_77884/node_77888/tour-eiffel-tour-eiffel-illumin%C3%A9e-depuis-champs-de-mars-%C3%A9clairage-dor%C3%A9-%7C-630x405-%7C-%C2%A9-sete-emeric-livinec/21230551-1-fre-FR/Tour-Eiffel-Tour-Eiffel-illumin%C3%A9e-depuis-Champs-de-Mars-%C3%A9clairage-dor%C3%A9-%7C-630x405-%7C-%C2%A9-SETE-Emeric-Livinec.jpg";
-		Resource imageResource = this.resourceLoader.getResource(imageUrl);
-		AnnotateImageResponse response = this.cloudVisionTemplate.analyzeImage(imageResource,
-				Feature.Type.LANDMARK_DETECTION);
+  @Value("${GOOGLE_API_KEY}")
+  private String googleAPIKey;
 
-		return response.getLandmarkAnnotationsList().toString();
-	}
+  @GetMapping ("/uploadimage")
+  public String displayCloudVisionAPIPage(){
+    return "customers/cloudvisionapi";
+  }
 
-  @GetMapping("/extractTextFromImage")
-	public String extract() {
-		String imageUrl = "https://cloud.google.com/vision/docs/images/sign_text.png";
-		return this.cloudVisionTemplate.extractTextFromImage(this.resourceLoader.getResource(imageUrl));
-	}
+   @PostMapping("/getImageDetection")
+    public String uploadGetImageDetectionReadings(@RequestParam String api_type, RedirectAttributes redirectAttributes, @RequestParam("image")MultipartFile file, Model model) throws IOException {
+        System.out.println(file.getOriginalFilename());
+        System.out.println("api_type: " + api_type);
+
+        List<EntityAnnotation> landmarkAnnotationResults = null;
+        List<EntityAnnotation> labelAnnotationResults = null;
+        // List<FaceAnnotation> faceAnnotationResults = null;
+        if (!file.isEmpty()){
+            String imagePath = StringUtils.cleanPath(file.getOriginalFilename());
+
+            Date date = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("YYYYMMDD");
+            System.out.println(formatter.format(date));
+
+            User currentUser = userService.getByEmail(userService.getLoggedInUser()) ;
+            String currentUserId = currentUser.getId();
+            System.out.println("Current User: " + currentUser.getName());
+            String uploadDir = "analyzed-images/" + currentUserId;
+
+            String uniqueImagePath = formatter.format(date) + "_" + imagePath ;
+            String path = FileUploadUtil.saveFile(uploadDir, uniqueImagePath, file);
+            System.out.println("Path: " + path);
+
+            Resource imageResource = this.resourceLoader.getResource("file:" + path);
+            Feature.Type type;
+            AnnotateImageResponse response;
+            String textDetectionResults = "";
+            switch(api_type){
+            //   case "FACE_DETECTION":
+            //         type = Feature.Type.FACE_DETECTION;
+            //         response = this.cloudVisionTemplate.analyzeImage(imageResource,
+			// 	        type);
+            //         faceAnnotationResults = response.getFaceAnnotationsList();
+            //         System.out.println("Face Detection Result: " + faceAnnotationResults);
+            //         break;
+              case "LANDMARK_DETECTION":
+                    type = Feature.Type.LANDMARK_DETECTION;
+                    response = this.cloudVisionTemplate.analyzeImage(imageResource,
+                        type);
+                    landmarkAnnotationResults = response.getLandmarkAnnotationsList();
+                    System.out.println("Landmark Detection Result: " + landmarkAnnotationResults);
+                    break;
+            //   case "LOGO_DETECTION":
+            //         type = Feature.Type.LOGO_DETECTION;
+            //         response = this.cloudVisionTemplate.analyzeImage(imageResource,
+            //             type);
+            //         entityAnnotationResults = response.getLogoAnnotationsList();
+            //         System.out.println("Logo Detection Result: " + entityAnnotationResults);
+            //         break;
+              case "LABEL_DETECTION":
+                    type = Feature.Type.LABEL_DETECTION;
+                    response = this.cloudVisionTemplate.analyzeImage(imageResource,
+				        type);
+                    labelAnnotationResults = response.getLabelAnnotationsList();
+                    System.out.println("Label Detection Result: " + labelAnnotationResults);
+                    break;
+              case "TEXT_DETECTION":
+                    type = Feature.Type.TEXT_DETECTION;
+                    textDetectionResults = this.cloudVisionTemplate.extractTextFromImage(imageResource);
+                    System.out.println("Text Detection Result: " + textDetectionResults);
+                    break;
+              default:
+                  type = Feature.Type.UNRECOGNIZED;
+            }
+
+            if (landmarkAnnotationResults != null){
+                System.out.println("-------------");
+                for (EntityAnnotation ea : landmarkAnnotationResults){
+                    System.out.println(ea);
+                }
+                String googleMapUrl = "https://maps.googleapis.com/maps/api/js?key=" + googleAPIKey + "&callback=myMap";
+                model.addAttribute("googleMapUrl", googleAPIKey);
+                //  model.addAttribute("landmarkAnnotionResults", landmarkAnnotationResults);
+            }
+            else if (labelAnnotationResults != null){
+                System.out.println("-------------");
+                for (EntityAnnotation ea : labelAnnotationResults){
+                    System.out.println(ea);
+                }
+                redirectAttributes.addFlashAttribute("imagePath", "/"+uploadDir+"/"+uniqueImagePath);
+                redirectAttributes.addFlashAttribute("labelAnnotationResults", labelAnnotationResults);
+                redirectAttributes.addFlashAttribute("message", "Image has been uploaded successfully and processed with Google Vision API.");
+            }
+            //  else if (faceAnnotationResults != null){
+            //     for (FaceAnnotation fa : faceAnnotationResults){
+            //         System.out.println(fa);
+            //     }
+            //      model.addAttribute("analyzedResult", faceAnnotationResults);
+            // }
+             else if (!textDetectionResults.isEmpty()){
+                System.out.println("-------------");
+                System.out.println(textDetectionResults);
+                String[] texts = textDetectionResults.split("[\\n\\s]");
+                System.out.println(texts.length);
+                for (String t : texts){
+                      System.out.println(t);
+                }
+              
+                redirectAttributes.addFlashAttribute("imagePath", "/"+uploadDir+"/"+uniqueImagePath);
+                redirectAttributes.addFlashAttribute("textDetectionResults", texts);
+                redirectAttributes.addFlashAttribute("message", "Image has been uploaded successfully and processed with Google Vision API.");
+            } else{
+                System.out.println("No Results Found");
+                redirectAttributes.addFlashAttribute("message", "Image has been uploaded successfully and processed with Google Vision API -- [No Results Found!]");
+            }
+        }
+
+        return "redirect:/uploadimage";
+    }
 }

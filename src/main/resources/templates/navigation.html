@@ -23,6 +23,10 @@
           <a class="nav-link" th:href="@{/users}">Users</a>
         </li>
 
+        <li class="nav-item" sec:authorize="hasAuthority('customer')">
+          <a class="nav-link" th:href="@{/uploadimage}">Photo Recognition Detection</a>
+        </li>
+
         <li>
           <span class="fas fa-user fa-2x icon-silver"></span>
         </li>

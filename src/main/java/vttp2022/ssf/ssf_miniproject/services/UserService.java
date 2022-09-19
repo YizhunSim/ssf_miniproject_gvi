@@ -8,6 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +21,7 @@ import vttp2022.ssf.ssf_miniproject.repositories.UserRepository;
 
 @Service
 public class UserService {
-  public static final int USER_PER_PAGE = 4;
+  public static final int USER_PER_PAGE = 5;
 
   @Autowired
   private UserRepository userRepo;
@@ -117,6 +120,16 @@ public class UserService {
             return userRepo.findById(id.toString()).get();
         } catch(NoSuchElementException ex){
             throw new UserNotFoundException("Could not find any user with ID " + id);
+        }
+    }
+
+    public String getLoggedInUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+         String currentUserName = authentication.getName();
+         return currentUserName;
+        }else{
+            return null;
         }
     }
 

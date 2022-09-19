@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="fragments :: page_head('Google Cloud Vision API')"></head>
+ <body>
+  <div class="container-fluid">
+    <div th:replace="navigation :: menu"></div>
+    <h1>Cloud Vision API Test</h1>
+    <p>
+      Google Limited Preview<a href="https://cloud.google.com/vision/" target="_blank"> Cloud Vision API - </a>After selecting the test target image and API type, press "Submit" and the result will be displayed below.
+    </p>
+
+    <div>
+      <form th:action="@{/getImageDetection}"
+        method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="input-img">Upload Image</label>
+          <input type="file" id="fileImage" name="image" accept="image/png, image/jpeg" class="mb-2">
+        </div>
+        <div class="form-group">
+          <img id="img" src="" class="img-responsive"></img>
+        </div>
+        <div class="form-group">
+          <label for="api-type">API Type</label>
+          <select id="api-type" name="api_type" class="form-control">
+            <!-- <option value="FACE_DETECTION">FACE_DETECTION</option> -->
+            <option value="LANDMARK_DETECTION">LANDMARK_DETECTION</option>
+            <!-- <option value="LOGO_DETECTION">LOGO_DETECTION</option> -->
+            <option value="LABEL_DETECTION">LABEL_DETECTION</option>
+            <option value="TEXT_DETECTION">TEXT_DETECTION</option>
+          </select>
+        </div>
+        <button id="submit-btn" class="btn btn-primary mt-2">Submit</button>
+      </form>
+        <span class="text-success" th:if="${message != null}" th:text="${message}"></span>
+    </div>
+    <hr>
+    <div id="result">
+      <h2 class="d-flex justify-content-center">Results</h2>
+      <span class="d-flex justify-content-center text-danger" th:if="${labelAnnotationResults == null} and ${landmarkAnnotationResults == null} and ${textDetectionResults == null} and ${message != null}">No Results Found!</span>
+
+       <div id="map"></div>
+
+
+
+      <div th:if="${labelAnnotationResults != null}">
+        <div class="d-flex justify-content-center">
+          <div class="image-box m-3">
+            <img th:src="@{${imagePath}}"
+            class="img-thumbnail" style="max-width:100%;"
+            alt="label annotation"/>
+          </div>
+          <div class="ml-3" style="width:40%">
+            <th:block th:each="labels: ${labelAnnotationResults}">
+              <div class="row">
+                <div class="name col-5">[[${labels.description}]]</div>
+                <div class="score col-7">[[${#numbers.formatPercent(labels.score,2,0)}]]</div>
+                <div class="progress meter">
+                  <div class="progress-bar bg-success" role="progressbar" aria-label="Success example"  th:style="'width:'+${#numbers.formatPercent(labels.score,2,0)}" th:attr="aria-valuenow=${#numbers.formatPercent(labels.score,2,0)}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+            </th:block>
+          </div>
+        </div>
+        <table id="result-table" class="table table-striped">
+          <thead>
+              <tr>
+                <td>mid</td>
+                <td>description</td>
+                <td>score</td>
+                <td>topicality</td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr th:each="imageProperties: ${labelAnnotationResults}">
+                <td>[[${imageProperties.mid}]]</td>
+                <td>[[${imageProperties.description}]]</td>
+                <td>[[${imageProperties.score}]]</td>
+                <td>[[${imageProperties.topicality}]]</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div th:if="${textDetectionResults != null}">
+        <div class="d-flex justify-content-center">
+          <div class="image-box m-3">
+            <img th:src="@{${imagePath}}"
+            class="img-thumbnail" style="max-width:100%;"
+            alt="text annotation"/>
+          </div>
+          <div class="ml-3" style="width:40%">
+            <div class="overflow-scroll" style="max-height: 350px">
+              <th:block th:each="textResult: ${textDetectionResults}">
+                <div class="card">
+                <h5 class="card-header">Text</h5>
+                <div class="card-body">
+                  <p class="card-text">[[${textResult}]]</p>
+                </div>
+              </div>
+              </th:block>
+            </div>
+          </div>
+        </div>
+        <table id="result-table" class="table table-striped">
+          <thead>
+              <tr>
+                <td>Text</td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr th:each="textResult: ${textDetectionResults}">
+                <td>[[${textResult}]]</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+    </div>
+      <div th:replace="fragments :: footer"></div>
+  </div>
+  <script>
+  let map;
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: -34.397, lng: 150.644 },
+      zoom: 8,
+    });
+  }
+  </script>
+</body>
+</html>

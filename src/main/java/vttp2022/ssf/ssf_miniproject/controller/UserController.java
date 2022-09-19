@@ -32,7 +32,7 @@ public class UserController {
 
   @GetMapping("/users")
     public String listAll(Model model){
-        return "somepage";
+         return listByPage(1, model, "name", "asc", null);
 
     }
 
@@ -44,6 +44,10 @@ public class UserController {
 
         Page<User> page = userService.listByPage(pageNum, sortField, sortOrder, keyword);
         List<User> listUsers = page.getContent();
+
+        for (User u : listUsers){
+          System.out.println("User: " + u);
+        }
 
         System.out.println("PageNum = " + pageNum);
         System.out.println("Total elements = " + page.getTotalElements());

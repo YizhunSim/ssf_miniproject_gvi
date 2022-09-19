@@ -36,6 +36,7 @@ public class SecurityConfiguration {
       http.authorizeRequests()
               .antMatchers("/login").permitAll()
               .antMatchers("/users/**", "/settings/**").hasAuthority("admin")
+              .antMatchers("/customers/**").hasAuthority("customer")
               .anyRequest().authenticated()
               .and().formLogin()
               .loginPage("/login")

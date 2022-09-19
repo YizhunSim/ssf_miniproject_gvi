@@ -50,67 +50,16 @@
           <thead class="table-dark">
             <tr>
               <th th:replace="fragments :: column_link('id', 'User ID')"></th>
-              <th>Photos</th>
               <th th:replace="fragments :: column_link('email', 'Email')"></th>
-              <!-- <th
-                th:replace="fragments :: column_link('firstName', 'First Name')"
-              ></th>
-              <th
-                th:replace="fragments :: column_link('lastName', 'Last Name')"
-              ></th>
-              <th>Roles</th>
-              <th
-                th:replace="fragments :: column_link('enabled', 'Enabled')"
-              ></th> -->
+              <th th:replace="fragments :: column_link('name', 'Name')"></th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr th:each="user: ${listUsers}">
               <td>[[${user.id}]]</td>
-              <!-- <td>
-                <span
-                  th:if="${user.photos == null}"
-                  class="fa-solid fa-image-portrait fa-3x icon-silver"
-                ></span>
-                <img
-                  th:if="${user.photos != null}"
-                  th:src="@{${user.photosImagePath}}"
-                  style="width: 100px"
-                />
-              </td> -->
               <td>[[${user.email}]]</td>
-              <!-- <td>[[${user.firstName}]]</td>
-              <td>[[${user.lastName}]]</td>
-              <td>[[${user.roles}]]</td> -->
-              <!-- <td>
-                <a
-                  th:if="${user.enabled == true}"
-                  class="fas fa-check-circle fa-2x icon-green"
-                  th:href="@{'/users/' + ${user.id} + '/enabled/false'}"
-                  title="Disable this user"
-                ></a>
-                <a
-                  th:if="${user.enabled == false}"
-                  class="fas fa-circle fa-2x icon-gray"
-                  th:href="@{'/users/' + ${user.id} + '/enabled/true'} "
-                  title="Enable this user"
-                ></a>
-              </td> -->
-              <td>
-                <a
-                  class="fas fa-edit fa-2x icon-green"
-                  th:href="@{'/users/edit/' + ${user.id}}"
-                  title="Edit this user"
-                ></a>
-                &nbsp;
-                <a
-                  class="fas fa-trash fa-2x icon-dark link-delete"
-                  th:href="@{'/users/delete/' + ${user.id}}"
-                  th:userId="${user.id}"
-                  title="Delete this user"
-                ></a>
-              </td>
+              <td>[[${user.name}]]</td>
             </tr>
           </tbody>
         </table>
@@ -142,12 +91,55 @@
               ></a>
             </li>
 
-            <li
-              th:class="${currentPage != i ? 'page-item' : 'page-item active' }"
-              th:each="i : ${#numbers.sequence(1, totalPages)}"
-            >
-              <a th:replace="fragments :: page_link(${i}, ${i})"></a>
-            </li>
+            <th:block th:if="${totalPages <= 10}">
+              <li
+                th:class="${currentPage != i ? 'page-item' : 'page-item active' }"
+                th:each="i : ${#numbers.sequence(1, totalPages)}"
+              >
+                <a th:replace="fragments :: page_link(${i}, ${i})"></a>
+              </li>
+            </th:block>
+
+            <th:block th:if="${totalPages > 10}">
+              <th:block
+                th:if="${currentPage <= 5 || currentPage > totalPages - 4}"
+              >
+                <li
+                  th:class="${currentPage != i ? 'page-item' : 'page-item active' }"
+                  th:each="i : ${#numbers.sequence(1, 5)}"
+                >
+                  <a th:replace="fragments :: page_link(${i}, ${i})"></a>
+                </li>
+
+                <a th:replace="fragments :: page_link(6, ...)"></a>
+
+                <li
+                  th:class="${currentPage != i ? 'page-item' : 'page-item active' }"
+                  th:each="i : ${#numbers.sequence(totalPages - 4, totalPages)}"
+                >
+                  <a th:replace="fragments :: page_link(${i}, ${i})"></a>
+                </li>
+              </th:block>
+
+              <th:block
+                th:if="${currentPage > 5 && currentPage < totalPages - 4}"
+              >
+                <a
+                  th:replace="fragments :: page_link(${currentPage - 5}, ...)"
+                ></a>
+
+                <li
+                  th:class="${currentPage != i ? 'page-item' : 'page-item active' }"
+                  th:each="i : ${#numbers.sequence(currentPage - 4, currentPage + 4)}"
+                >
+                  <a th:replace="fragments :: page_link(${i}, ${i})"></a>
+                </li>
+
+                <a
+                  th:replace="fragments :: page_link(${currentPage + 5}, ...)"
+                ></a>
+              </th:block>
+            </th:block>
 
             <li
               th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled' }"

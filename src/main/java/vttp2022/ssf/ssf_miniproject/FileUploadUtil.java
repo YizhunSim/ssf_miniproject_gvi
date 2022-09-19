@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption;
 public class FileUploadUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadUtil.class);
-    public static void saveFile(String uploadDir, String fileName, MultipartFile multipartFile) throws IOException {
+    public static String saveFile(String uploadDir, String fileName, MultipartFile multipartFile) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
 
         if (!Files.exists(uploadPath)){
@@ -24,6 +24,7 @@ public class FileUploadUtil {
         try(InputStream inputStream = multipartFile.getInputStream()){
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+            return filePath.toAbsolutePath().toString();
         } catch(IOException ex){
             throw new IOException("Could not save file: " + fileName, ex);
         }

@@ -1,4 +1,26 @@
-*.icon-white {color: white}
-*.icon-silver {color: silver}
-*.icon-green {color: green}
-*.icon-gray {color: gray}
+*.icon-white {
+  color: white;
+}
+*.icon-silver {
+  color: silver;
+}
+*.icon-green {
+  color: green;
+}
+*.icon-gray {
+  color: gray;
+}
+
+.score {
+  flex-grow: 1;
+  text-align: right;
+}
+
+.meter {
+  flex-basis: 100%;
+  margin-top: 4px;
+}
+
+.image-box {
+  width: 350px;
+}
