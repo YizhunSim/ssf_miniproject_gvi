@@ -1,66 +1,66 @@
-package vttp2022.ssf.ssf_miniproject.boot;
+// package vttp2022.ssf.ssf_miniproject.boot;
 
-import org.springframework.boot.CommandLineRunner;
+// import org.springframework.boot.CommandLineRunner;
 
-import java.util.Random;
-import java.util.stream.IntStream;
+// import java.util.Random;
+// import java.util.stream.IntStream;
 
-import vttp2022.ssf.ssf_miniproject.models.Book;
-import vttp2022.ssf.ssf_miniproject.models.BookRating;
-import vttp2022.ssf.ssf_miniproject.models.User;
-import vttp2022.ssf.ssf_miniproject.repositories.BookRatingRepository;
-
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
+// import vttp2022.ssf.ssf_miniproject.models.Book;
+// import vttp2022.ssf.ssf_miniproject.models.BookRating;
+// import vttp2022.ssf.ssf_miniproject.models.User;
+// import vttp2022.ssf.ssf_miniproject.repositories.BookRatingRepository;
 
 
-@Component
-@Order(4)
-@Slf4j
-public class CreateBookRatings implements CommandLineRunner{
-  @Value("${app.numberOfRatings}")
-  private Integer numberOfRatings;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.boot.CommandLineRunner;
+// import org.springframework.core.annotation.Order;
+// import org.springframework.data.redis.core.RedisTemplate;
+// import org.springframework.stereotype.Component;
 
-  @Value("${app.ratingStars}")
-  private Integer ratingStars;
+// import lombok.extern.slf4j.Slf4j;
 
-  @Autowired
-  private RedisTemplate<String, String> redisTemplate;
 
-  @Autowired
-  private BookRatingRepository bookRatingRepository;
+// @Component
+// @Order(4)
+// @Slf4j
+// public class CreateBookRatings implements CommandLineRunner{
+//   @Value("${app.numberOfRatings}")
+//   private Integer numberOfRatings;
 
-  @Override
-  public void run(String... args) throws Exception {
-    System.out.println(">>> Hello from the CreateBookRatings CommandLineRunner...");
-    if (bookRatingRepository.count() == 0) {
-      Random random = new Random();
-      IntStream.range(0, numberOfRatings).forEach(n -> {
-        String bookId = redisTemplate.opsForSet().randomMember(Book.class.getName());
-        String userId = redisTemplate.opsForSet().randomMember(User.class.getName());
-        int stars = random.nextInt(ratingStars) + 1;
+//   @Value("${app.ratingStars}")
+//   private Integer ratingStars;
 
-        User user = new User();
-        user.setId(userId);
+//   @Autowired
+//   private RedisTemplate<String, String> redisTemplate;
 
-        Book book = new Book();
-        book.setId(bookId);
+//   @Autowired
+//   private BookRatingRepository bookRatingRepository;
 
-        BookRating rating = BookRating.builder() //
-            .user(user) //
-            .book(book) //
-            .rating(stars).build();
-        bookRatingRepository.save(rating);
-      });
+//   @Override
+//   public void run(String... args) throws Exception {
+//     System.out.println(">>> Hello from the CreateBookRatings CommandLineRunner...");
+//     if (bookRatingRepository.count() == 0) {
+//       Random random = new Random();
+//       IntStream.range(0, numberOfRatings).forEach(n -> {
+//         String bookId = redisTemplate.opsForSet().randomMember(Book.class.getName());
+//         String userId = redisTemplate.opsForSet().randomMember(User.class.getName());
+//         int stars = random.nextInt(ratingStars) + 1;
 
-      log.info(">>>> BookRating created...");
-    }
-  }
-}
+//         User user = new User();
+//         user.setId(userId);
+
+//         Book book = new Book();
+//         book.setId(bookId);
+
+//         BookRating rating = BookRating.builder() //
+//             .user(user) //
+//             .book(book) //
+//             .rating(stars).build();
+//         bookRatingRepository.save(rating);
+//       });
+
+//       log.info(">>>> BookRating created...");
+//     }
+//   }
+// }

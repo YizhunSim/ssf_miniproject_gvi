@@ -46,7 +46,7 @@ public class CreateUsers implements CommandLineRunner{
         TypeReference<List<User>> typeReference = new TypeReference<List<User>>() {
         };
         // make the JSON data available as an input stream
-        InputStream inputStream = getClass().getResourceAsStream("/data/users/users.json");
+        InputStream inputStream = getClass().getResourceAsStream("/data/users/MOCK_DATA_USERS.json");
         // convert the JSON to objects
         List<User> users = mapper.readValue(inputStream, typeReference);
 
@@ -62,10 +62,13 @@ public class CreateUsers implements CommandLineRunner{
 
 
       User adminUser = new User();
-      adminUser.setName("Adminus Admistradore");
+      adminUser.setFirstName("Adminus");
+      adminUser.setLastName("Admistradore");
       adminUser.setEmail("admin@example.com");
       adminUser.setPassword(passwordEncoder.encode("Reindeer Flotilla"));//
       adminUser.addRole(admin);
+      adminUser.setPhotos("default-user.png");
+      adminUser.setEnabled(true);
 
       userRepository.save(adminUser);
       log.info(">>>> Loaded User Data and Created users...");

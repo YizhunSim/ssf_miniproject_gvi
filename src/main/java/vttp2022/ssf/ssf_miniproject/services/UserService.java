@@ -2,6 +2,7 @@ package vttp2022.ssf.ssf_miniproject.services;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -78,12 +79,12 @@ public class UserService {
             userInDB.setPassword(userInForm.getPassword());
             encodePassword(userInDB);
         }
-        // if (userInForm.getPhotos() != null){
-        //     userInDB.setPhotos(userInForm.getPhotos());
-        // }
+        if (userInForm.getPhotos() != null){
+            userInDB.setPhotos(userInForm.getPhotos());
+        }
 
-        // userInDB.setFirstName(userInForm.getFirstName());
-        // userInDB.setLastName(userInForm.getLastName());
+        userInDB.setFirstName(userInForm.getFirstName());
+        userInDB.setLastName(userInForm.getLastName());
 
         return userRepo.save(userInDB);
 
@@ -133,15 +134,15 @@ public class UserService {
         }
     }
 
-    // public void delete (Integer id) throws UserNotFoundException {
-    //     Long countById = userRepo.countById(id);
+    public void delete (String id) throws UserNotFoundException {
+        Optional<User> countById = userRepo.findById(id);
 
-    //     if (countById == null || countById == 0){
-    //         throw new UserNotFoundException("Could not find any user with ID " + id);
-    //     }
+        if (countById.isEmpty()){
+            throw new UserNotFoundException("Could not find any user with ID " + id);
+        }
 
-    //     userRepo.deleteById(id);
-    // }
+        userRepo.deleteById(id);
+    }
 
 
 }

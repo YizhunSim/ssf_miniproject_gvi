@@ -24,3 +24,8 @@
 .image-box {
   width: 350px;
 }
+
+#map {
+  height: 400px;
+  width: 600px;
+}

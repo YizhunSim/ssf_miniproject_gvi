@@ -44,7 +44,8 @@ public class VisionController {
   @Autowired
   private UserService userService;
 
-  @Value("${GOOGLE_API_KEY}")
+
+@Value("${app.googlemap.apikey}")
   private String googleAPIKey;
 
   @GetMapping ("/uploadimage")
@@ -69,7 +70,7 @@ public class VisionController {
 
             User currentUser = userService.getByEmail(userService.getLoggedInUser()) ;
             String currentUserId = currentUser.getId();
-            System.out.println("Current User: " + currentUser.getName());
+            System.out.println("Current User: " + currentUser.getFirstName() + " " + currentUser.getLastName());
             String uploadDir = "analyzed-images/" + currentUserId;
 
             String uniqueImagePath = formatter.format(date) + "_" + imagePath ;
@@ -124,15 +125,18 @@ public class VisionController {
                     System.out.println(ea);
                 }
                 String googleMapUrl = "https://maps.googleapis.com/maps/api/js?key=" + googleAPIKey + "&callback=myMap";
-                model.addAttribute("googleMapUrl", googleAPIKey);
-                //  model.addAttribute("landmarkAnnotionResults", landmarkAnnotationResults);
+                System.out.println(googleMapUrl);
+                redirectAttributes.addFlashAttribute("googleMapUrl", googleMapUrl);
+                redirectAttributes.addFlashAttribute("imagePath", "/" + uploadDir + "/" + uniqueImagePath);
+                redirectAttributes.addFlashAttribute("landmarkAnnotationResults", landmarkAnnotationResults);
+                redirectAttributes.addFlashAttribute("message", "Image has been uploaded successfully and processed with Google Vision API.");
             }
             else if (labelAnnotationResults != null){
                 System.out.println("-------------");
                 for (EntityAnnotation ea : labelAnnotationResults){
                     System.out.println(ea);
                 }
-                redirectAttributes.addFlashAttribute("imagePath", "/"+uploadDir+"/"+uniqueImagePath);
+                redirectAttributes.addFlashAttribute("imagePath", "/" + uploadDir + "/" + uniqueImagePath);
                 redirectAttributes.addFlashAttribute("labelAnnotationResults", labelAnnotationResults);
                 redirectAttributes.addFlashAttribute("message", "Image has been uploaded successfully and processed with Google Vision API.");
             }
@@ -150,7 +154,7 @@ public class VisionController {
                 for (String t : texts){
                       System.out.println(t);
                 }
-              
+
                 redirectAttributes.addFlashAttribute("imagePath", "/"+uploadDir+"/"+uniqueImagePath);
                 redirectAttributes.addFlashAttribute("textDetectionResults", texts);
                 redirectAttributes.addFlashAttribute("message", "Image has been uploaded successfully and processed with Google Vision API.");

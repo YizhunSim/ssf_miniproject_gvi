@@ -1,5 +1,7 @@
 package vttp2022.ssf.ssf_miniproject.controller;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
@@ -32,7 +34,7 @@ public class UserController {
 
   @GetMapping("/users")
     public String listAll(Model model){
-         return listByPage(1, model, "name", "asc", null);
+         return listByPage(1, model, "firstName", "asc", null);
 
     }
 
@@ -44,10 +46,6 @@ public class UserController {
 
         Page<User> page = userService.listByPage(pageNum, sortField, sortOrder, keyword);
         List<User> listUsers = page.getContent();
-
-        for (User u : listUsers){
-          System.out.println("User: " + u);
-        }
 
         System.out.println("PageNum = " + pageNum);
         System.out.println("Total elements = " + page.getTotalElements());
@@ -81,7 +79,7 @@ public class UserController {
         List<Role> listRoles = userService.listRoles();
 
         User user = new User();
-        // user.setEnabled(true);
+        user.setEnabled(true);
         model.addAttribute("user", user);
         model.addAttribute("listRoles", listRoles);
         model.addAttribute("pageTitle", "Create New User");
@@ -95,7 +93,7 @@ public class UserController {
 
         if (!multipartFile.isEmpty()){
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-            // user.setPhotos(fileName);
+            user.setPhotos(fileName);
             User savedUser = userService.save(user);
 
             String uploadDir = "user-photos/" + savedUser.getId();
@@ -103,9 +101,9 @@ public class UserController {
             FileUploadUtil.cleanDir(uploadDir);
             FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
         } else{
-            // if (user.getPhotos().isEmpty()){
-            //     user.setPhotos(null);
-            // }
+            if (user.getPhotos().isEmpty()){
+                user.setPhotos(null);
+            }
             userService.save(user);
         }
 
@@ -133,16 +131,16 @@ public class UserController {
        }
     }
 
-    // @GetMapping("/users/delete/{id}")
-    // public String deleteUser(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model){
-    //     try{
-    //         userService.delete(id);
-    //         redirectAttributes.addFlashAttribute("message", "The user ID " + id + " has been deleted successfully");
-    //     }catch(UserNotFoundException ex){
-    //         redirectAttributes.addFlashAttribute("message", ex.getMessage());
-    //     }
-    //     return "redirect:/users";
-    // }
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model){
+        try{
+            userService.delete(id);
+            redirectAttributes.addFlashAttribute("message", "The user ID " + id + " has been deleted successfully");
+        }catch(UserNotFoundException ex){
+            redirectAttributes.addFlashAttribute("message", ex.getMessage());
+        }
+        return "redirect:/users";
+    }
 
     // @GetMapping("/users/{id}/enabled/{status}")
     // public String updateUserEnabledStatus(@PathVariable("id") Integer id, @PathVariable("status") boolean enabled, RedirectAttributes redirectAttributes){

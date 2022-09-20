@@ -38,9 +38,44 @@
       <h2 class="d-flex justify-content-center">Results</h2>
       <span class="d-flex justify-content-center text-danger" th:if="${labelAnnotationResults == null} and ${landmarkAnnotationResults == null} and ${textDetectionResults == null} and ${message != null}">No Results Found!</span>
 
-       <div id="map"></div>
+       <div th:if="${landmarkAnnotationResults != null}">
+        <div class="d-flex justify-content-center">
+          <div class="image-box m-3">
+            <img th:src="@{${imagePath}}"
+            class="img-thumbnail" style="max-width:100%;"
+            alt="label annotation"/>
+          </div>
+          <div class="ml-3" style="width:40%">
 
-
+          <div class="overflow-scroll" style="max-height: 350px">
+            <th:block th:each="landmark: ${landmarkAnnotationResults}">
+              <div class="row">
+                <input type="hidden" th:value="${googleMapUrl}" th:attr="name='google_Map_Url'"/>
+                <div class="name text-primary col-5">[[${landmark.description}]]</div>
+                <div class="score col-7">[[${#numbers.formatPercent(landmark.score,2,0)}]]</div>
+                <div id="map"></div>
+              </div>
+            </th:block>
+          </div>
+          </div>
+        </div>
+        <table id="result-table" class="table table-striped">
+          <thead>
+              <tr>
+                <td>mid</td>
+                <td>description</td>
+                <td>score</td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr th:each="landmarkProperties: ${landmarkAnnotationResults}">
+                <td>[[${landmarkProperties.mid}]]</td>
+                <td>[[${landmarkProperties.description}]]</td>
+                <td>[[${landmarkProperties.score}]]</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div th:if="${labelAnnotationResults != null}">
         <div class="d-flex justify-content-center">
@@ -119,15 +154,23 @@
     </div>
       <div th:replace="fragments :: footer"></div>
   </div>
-  <script>
+  <!-- <script>
+// const script = document.createElement('script');
+// script.defer = true;
+// script.async = true;
+// script.src = `https://maps.googleapis.com/maps/api/js?key=${googleAPIKey}&callback=initMap`;
+// document.appendChild(script);
+
   let map;
 
-  function initMap() {
+  function myMap() {
+
     map = new google.maps.Map(document.getElementById("map"), {
       center: { lat: -34.397, lng: 150.644 },
       zoom: 8,
     });
   }
-  </script>
+  </script> -->
+
 </body>
 </html>

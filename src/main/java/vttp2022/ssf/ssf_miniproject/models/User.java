@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,10 +32,10 @@ public class User {
   @ToString.Include
   private String id;
 
-  @NotNull
-  @Size(min = 2, max = 48)
-  @ToString.Include
-  private String name;
+  // @NotNull
+  // @Size(min = 2, max = 48)
+  // @ToString.Include
+  // private String name;
 
   @NotNull
   @Email
@@ -49,6 +50,24 @@ public class User {
   @Transient
   private String passwordConfirm;
 
+  @NotNull
+  @Size(min = 2, max = 48)
+  @ToString.Include
+  @JsonProperty("first_name")
+  private String firstName;
+
+  @NotNull
+  @Size(min = 2, max = 48)
+  @ToString.Include
+  @JsonProperty("last_name")
+  private String lastName;
+
+  @NotNull
+  private boolean enabled;
+
+  @NotNull
+  private String photos;
+
   @Reference
   private Set<Role> roles = new HashSet<Role>();
 
@@ -56,5 +75,11 @@ public class User {
     roles.add(role);
   }
 
+  @Transient
+  public String getPhotosImagePath(){
+      if (id == null || photos == null) return "/images/default-user.png";
+
+      return "/user-photos/" + this.id + "/" + this.photos;
+  }
 
 }

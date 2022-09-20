@@ -30,15 +30,21 @@
             th:value="${keyword}"
             class="form-control"
             required
+            disabled
           />
-          &nbsp;&nbsp;
-          <input type="submit" value="Search" class="btn btn-primary" />
-          &nbsp;&nbsp;
+
+          <input
+            type="submit"
+            value="Search"
+            class="btn btn-primary mt-1"
+            disabled
+          />
           <input
             type="button"
             value="Clear"
-            class="btn btn-secondary"
+            class="btn btn-secondary mt-1"
             onclick="clearFilter()"
+            disabled
           />
         </form>
       </div>
@@ -50,16 +56,67 @@
           <thead class="table-dark">
             <tr>
               <th th:replace="fragments :: column_link('id', 'User ID')"></th>
+              <th>Photos</th>
               <th th:replace="fragments :: column_link('email', 'Email')"></th>
-              <th th:replace="fragments :: column_link('name', 'Name')"></th>
+              <th
+                th:replace="fragments :: column_link('firstName', 'First Name')"
+              ></th>
+              <th
+                th:replace="fragments :: column_link('lastName', 'Last Name')"
+              ></th>
+              <th>Roles</th>
+              <th
+                th:replace="fragments :: column_link('enabled', 'Enabled')"
+              ></th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr th:each="user: ${listUsers}">
               <td>[[${user.id}]]</td>
+              <td>
+                <span
+                  th:if="${user.photos == null}"
+                  class="fa-solid fa-image-portrait fa-3x icon-silver"
+                ></span>
+                <img
+                  th:if="${user.photos != null}"
+                  th:src="@{${user.photosImagePath}}"
+                  style="width: 100px"
+                />
+              </td>
               <td>[[${user.email}]]</td>
-              <td>[[${user.name}]]</td>
+              <td>[[${user.firstName}]]</td>
+              <td>[[${user.lastName}]]</td>
+              <td>[[${user.roles}]]</td>
+              <td>
+                <a
+                  th:if="${user.enabled == true}"
+                  class="fas fa-check-circle fa-2x icon-green"
+                  th:href="@{'/users/' + ${user.id} + '/enabled/false'}"
+                  title="Disable this user"
+                ></a>
+                <a
+                  th:if="${user.enabled == false}"
+                  class="fas fa-circle fa-2x icon-gray"
+                  th:href="@{'/users/' + ${user.id} + '/enabled/true'} "
+                  title="Enable this user"
+                ></a>
+              </td>
+              <td>
+                <a
+                  class="fas fa-edit fa-2x icon-green"
+                  th:href="@{'/users/edit/' + ${user.id}}"
+                  title="Edit this user"
+                ></a>
+                &nbsp;
+                <a
+                  class="fas fa-trash fa-2x icon-dark link-delete"
+                  th:href="@{'/users/delete/' + ${user.id}}"
+                  th:userId="${user.id}"
+                  title="Delete this user"
+                ></a>
+              </td>
             </tr>
           </tbody>
         </table>

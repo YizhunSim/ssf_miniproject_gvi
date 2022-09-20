@@ -20,5 +20,9 @@ public class Role {
 
   private String description;
 
+  @Override
+	public String toString() {
+		return this.name;
+	}
 
 }
