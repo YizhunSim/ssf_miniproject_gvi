@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -42,11 +43,37 @@ public class FileUploadUtil {
                         LOGGER.error("Could not delete file: " + file);
 //                        System.out.println("Could not delete file: " + file);
                     }
+                } else{
+                    deleteDirectory(file.toFile());
                 }
             });
         } catch(IOException ex){
             LOGGER.error("Could not list directory: " + dirPath);
 //            System.out.println("Could not list directory: " + dirPath);
         }
+    }
+
+    public static void copyFileToDestination(String source, Path targetDirectory){
+        System.out.println("copyFileToDestination - source: " + source + "destination: " + targetDirectory.getFileName());
+        Path sourceDirectory = Paths.get(source);
+        // Path targetDirectory = Paths.get(destination);
+
+        //copy source to target using Files Class
+        try {
+            Files.copy(sourceDirectory, targetDirectory);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean deleteDirectory (File directoryToBeDeleted){
+        System.out.println("Delete Directory: "+ directoryToBeDeleted.getName());
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+        for (File file : allContents) {
+            deleteDirectory(file);
+        }
+        }
+        return directoryToBeDeleted.delete();
     }
 }

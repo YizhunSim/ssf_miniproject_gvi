@@ -17,7 +17,7 @@ import vttp2022.ssf.ssf_miniproject.repositories.UserRepository;
 import vttp2022.ssf.ssf_miniproject.services.UserService;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping
 public class UserRestController {
   @Autowired
   private UserRepository userRepository;

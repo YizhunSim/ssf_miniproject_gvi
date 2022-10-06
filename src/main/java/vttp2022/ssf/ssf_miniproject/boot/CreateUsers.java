@@ -2,6 +2,9 @@ package vttp2022.ssf.ssf_miniproject.boot;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+import vttp2022.ssf.ssf_miniproject.FileUploadUtil;
 import vttp2022.ssf.ssf_miniproject.models.Role;
 import vttp2022.ssf.ssf_miniproject.models.User;
 import vttp2022.ssf.ssf_miniproject.repositories.RoleRepository;
@@ -71,7 +75,32 @@ public class CreateUsers implements CommandLineRunner{
       adminUser.setEnabled(true);
 
       userRepository.save(adminUser);
+
+      flushCleanUserPhotosFolders("user-photos");
+      createUserPhotosFolders((List<User>) userRepository.findAll());
       log.info(">>>> Loaded User Data and Created users...");
+    }
+  }
+
+  private void flushCleanUserPhotosFolders(String dir){
+    System.out.println("flushCleanUserPhotosFolders: " + dir);
+    FileUploadUtil.cleanDir(dir);
+  }
+
+  private void createUserPhotosFolders(List<User> users){
+    for (User u : users){
+      String userId = u.getId();
+      System.out.println("User Id: " + userId);
+      String uploadDir = "user-photos/" + userId;
+
+      Path path = Paths.get(uploadDir);
+      try {
+        Files.createDirectory(path);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      System.out.println("Directory: " + uploadDir + " created Successfully!");
+      // FileUploadUtil.copyFileToDestination(System.getProperty("user.dir")+"/src/main/resources/static/images/default-user.png", path);
     }
   }
 }

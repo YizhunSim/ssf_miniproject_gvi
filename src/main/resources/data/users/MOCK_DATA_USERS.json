@@ -1,0 +1,42 @@
+[
+  {
+    "password": "WOR87Oc",
+    "first_name": "Daffie",
+    "last_name": "Tamburi",
+    "email": "dtamburi0@theglobeandmail.com",
+    "photos": "default-user.png",
+    "enabled": true
+  },
+  {
+    "password": "01GZjpF9",
+    "first_name": "Ebenezer",
+    "last_name": "Cobbledick",
+    "email": "ecobbledick1@jugem.jp",
+    "photos": "default-user.png",
+    "enabled": false
+  },
+  {
+    "password": "EzbPIu",
+    "first_name": "Timmy",
+    "last_name": "Wyett",
+    "email": "twyett2@behance.net",
+    "photos": "default-user.png",
+    "enabled": true
+  },
+  {
+    "password": "PPayvMBH",
+    "first_name": "Olympe",
+    "last_name": "Lougheed",
+    "email": "olougheed3@mtv.com",
+    "photos": "default-user.png",
+    "enabled": false
+  },
+  {
+    "password": "kFxC2Q",
+    "first_name": "Constancia",
+    "last_name": "Van den Dael",
+    "email": "cvandendael4@amazonaws.com",
+    "photos": "default-user.png",
+    "enabled": true
+  }
+]

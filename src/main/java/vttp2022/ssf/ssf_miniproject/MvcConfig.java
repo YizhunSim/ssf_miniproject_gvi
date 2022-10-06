@@ -14,6 +14,7 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         exposeDirectory("user-photos", registry);
         exposeDirectory("analyzed-images", registry);
+        exposeDirectory(System.getProperty("user.dir")+"/src/main/resources/static/images", registry);
     }
 
     private void exposeDirectory(String dirName, ResourceHandlerRegistry registry) {

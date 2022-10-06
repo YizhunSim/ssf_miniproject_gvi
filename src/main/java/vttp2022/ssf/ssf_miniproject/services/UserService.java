@@ -3,6 +3,7 @@ package vttp2022.ssf.ssf_miniproject.services;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,9 +57,12 @@ public class UserService {
     }
 
     public User save(User user) {
-        boolean isUpdatingExistingUser = user.getId() != null;
+        System.out.println("user: " + user);
+        System.out.println("userid: " + user.getId());
+        boolean isUpdatingExistingUser = user.getId().isEmpty();
 
-        if (isUpdatingExistingUser){
+        if (!isUpdatingExistingUser){
+            System.out.println("isUpdatingExistingUser");
             User existingUser = userRepo.findById(user.getId()).get();
 
             if (user.getPassword().isEmpty()){
@@ -66,10 +70,25 @@ public class UserService {
             }else{
                 encodePassword(user);
             }
+             return userRepo.save(user);
         }else{
+            User newUser = new User();
+            newUser.setFirstName(user.getFirstName());
+            newUser.setLastName(user.getLastName());
+            newUser.setEmail(user.getEmail());
             encodePassword(user);
+            Set<Role> getRoles = user.getRoles();
+
+            Role admin = roleRepo.findFirstByName("admin");
+            Role customer = roleRepo.findFirstByName("customer");
+            if (getRoles.contains(admin)){
+                newUser.addRole(admin);
+            } else{
+                newUser.addRole(customer);
+            }
+            return userRepo.save(newUser);
         }
-        return userRepo.save(user);
+
     }
 
     public User updateAccount(User userInForm){
