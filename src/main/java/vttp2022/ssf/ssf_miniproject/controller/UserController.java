@@ -88,12 +88,16 @@ public class UserController {
 
     @PostMapping("/users/save")
     public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image")MultipartFile multipartFile) throws IOException {
-//        System.out.println(user);
-//        System.out.println(multipartFile.getOriginalFilename());
-
+       System.out.println(multipartFile.getOriginalFilename());
+        if (user.isEnabled()){
+            user.setEnabled(true);
+        }else{
+            user.setEnabled(false);
+        }
         if (!multipartFile.isEmpty()){
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
             user.setPhotos(fileName);
+
             User savedUser = userService.save(user);
 
             String uploadDir = "user-photos/" + savedUser.getId();
@@ -132,9 +136,14 @@ public class UserController {
     }
 
     @GetMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable(name = "id") String id, RedirectAttributes redirectAttributes, Model model){
+    public String deleteUser(@PathVariable(name = "id") String id, RedirectAttributes redirectAttributes){
         try{
+
             userService.delete(id);
+            String uploadDir = "user-photos/" + userService.get(id).getId();
+            System.out.println("deleteUser Clean up directory: " + uploadDir);
+            FileUploadUtil.cleanDir(uploadDir);
+
             redirectAttributes.addFlashAttribute("message", "The user ID " + id + " has been deleted successfully");
         }catch(UserNotFoundException ex){
             redirectAttributes.addFlashAttribute("message", ex.getMessage());

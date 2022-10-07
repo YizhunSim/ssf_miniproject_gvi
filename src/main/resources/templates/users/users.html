@@ -81,7 +81,7 @@
                 ></span>
                 <img
                   th:if="${user.photos != null}"
-                  th:src="@{${user.photosImagePath}}"
+                  th:src="@{${user.getPhotosImagePath}}"
                   style="width: 100px"
                 />
               </td>

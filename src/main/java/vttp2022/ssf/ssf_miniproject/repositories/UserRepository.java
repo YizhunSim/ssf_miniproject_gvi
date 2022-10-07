@@ -7,5 +7,4 @@ import vttp2022.ssf.ssf_miniproject.models.User;
 
 public interface UserRepository extends PagingAndSortingRepository<User, String>{
   User findFirstByEmail(String email);
-  
 }

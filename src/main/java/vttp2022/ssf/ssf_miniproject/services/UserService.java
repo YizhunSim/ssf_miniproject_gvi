@@ -58,7 +58,7 @@ public class UserService {
 
     public User save(User user) {
         System.out.println("user: " + user);
-        System.out.println("userid: " + user.getId());
+        // System.out.println("userid: " + user.getId());
         boolean isUpdatingExistingUser = user.getId().isEmpty();
 
         if (!isUpdatingExistingUser){
@@ -76,8 +76,10 @@ public class UserService {
             newUser.setFirstName(user.getFirstName());
             newUser.setLastName(user.getLastName());
             newUser.setEmail(user.getEmail());
+            newUser.setPhotos(user.getPhotos());
             encodePassword(user);
             Set<Role> getRoles = user.getRoles();
+            newUser.setEnabled(user.isEnabled());
 
             Role admin = roleRepo.findFirstByName("admin");
             Role customer = roleRepo.findFirstByName("customer");
@@ -137,11 +139,20 @@ public class UserService {
 
     public User get(String id) throws UserNotFoundException {
         try{
-            return userRepo.findById(id).get();
+            Optional<User> userInDB = userRepo.findById(id);
+            return userInDB.get();
         } catch(NoSuchElementException ex){
             throw new UserNotFoundException("Could not find any user with ID " + id);
         }
     }
+
+    // public User getUserByEmail(String email) throws UserNotFoundException {
+    //     try{
+    //         return userRepo.findFirstByEmail(email);
+    //     } catch(NoSuchElementException ex){
+    //         throw new UserNotFoundException("Could not find any user with ID " + email);
+    //     }
+    // }
 
     public String getLoggedInUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -155,7 +166,6 @@ public class UserService {
 
     public void delete (String id) throws UserNotFoundException {
         Optional<User> countById = userRepo.findById(id);
-
         if (countById.isEmpty()){
             throw new UserNotFoundException("Could not find any user with ID " + id);
         }

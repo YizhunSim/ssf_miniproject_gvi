@@ -63,9 +63,11 @@ public class User {
   private String lastName;
 
   @NotNull
+  @ToString.Include
   private boolean enabled;
 
   @NotNull
+  @ToString.Include
   private String photos;
 
   @Reference
@@ -77,7 +79,7 @@ public class User {
 
   @Transient
   public String getPhotosImagePath(){
-      if (id == null || photos == null) return "/images/default-user.png";
+      if (this.photos == null) return "/images/default-user.png";
 
       return "/user-photos/" + this.id + "/" + this.photos;
   }
