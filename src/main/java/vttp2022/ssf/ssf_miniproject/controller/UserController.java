@@ -117,7 +117,7 @@ public class UserController {
     }
 
     @GetMapping("/users/edit/{id}")
-    public String editUser(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model){
+    public String editUser(@PathVariable(name = "id") String id, RedirectAttributes redirectAttributes, Model model){
        try{
         User user = userService.get(id);
         List<Role> listRoles = userService.listRoles();
@@ -132,9 +132,9 @@ public class UserController {
     }
 
     @GetMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes, Model model){
+    public String deleteUser(@PathVariable(name = "id") String id, RedirectAttributes redirectAttributes, Model model){
         try{
-            userService.delete(Integer.toString(id));
+            userService.delete(id);
             redirectAttributes.addFlashAttribute("message", "The user ID " + id + " has been deleted successfully");
         }catch(UserNotFoundException ex){
             redirectAttributes.addFlashAttribute("message", ex.getMessage());
@@ -142,14 +142,14 @@ public class UserController {
         return "redirect:/users";
     }
 
-    // @GetMapping("/users/{id}/enabled/{status}")
-    // public String updateUserEnabledStatus(@PathVariable("id") Integer id, @PathVariable("status") boolean enabled, RedirectAttributes redirectAttributes){
-    //     userService.updateUserEnabledStatus(id, enabled);
-    //     String status = enabled ? "enabled" : "disabled";
-    //     String message = "The User ID " + id + " has been " + status;
-    //     redirectAttributes.addFlashAttribute("message", message);
-    //     return "redirect:/users";
-    // }
+    @GetMapping("/users/{id}/enabled/{status}")
+    public String updateUserEnabledStatus(@PathVariable("id") String id, @PathVariable("status") boolean enabled, RedirectAttributes redirectAttributes){
+        userService.updateUserEnabledStatus(id, enabled);
+        String status = enabled ? "enabled" : "disabled";
+        String message = "The User ID " + id + " has been " + status;
+        redirectAttributes.addFlashAttribute("message", message);
+        return "redirect:/users";
+    }
 
     // @GetMapping("/users/export/csv")
     // public void exportToCSV(HttpServletResponse response) throws IOException {

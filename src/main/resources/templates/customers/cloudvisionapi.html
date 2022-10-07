@@ -48,12 +48,11 @@
           <div class="ml-3" style="width:40%">
 
           <div class="overflow-scroll" style="max-height: 350px">
-            <th:block th:each="landmark: ${landmarkAnnotationResults}">
+            <th:block th:each="landmark: ${landmarkPositions}">
               <div class="row">
-                <input type="hidden" th:value="${googleMapUrl}" th:attr="name='google_Map_Url'"/>
                 <div class="name text-primary col-5">[[${landmark.description}]]</div>
                 <div class="score col-7">[[${#numbers.formatPercent(landmark.score,2,0)}]]</div>
-                <div id="map"></div>
+                <img th:src=${landmark.googleMapInitialiseURl} alt="">
               </div>
             </th:block>
           </div>
@@ -154,23 +153,34 @@
     </div>
       <div th:replace="fragments :: footer"></div>
   </div>
-  <!-- <script>
-// const script = document.createElement('script');
-// script.defer = true;
-// script.async = true;
-// script.src = `https://maps.googleapis.com/maps/api/js?key=${googleAPIKey}&callback=initMap`;
-// document.appendChild(script);
+  <script th:inline="javascript">
+/*<![CDATA[*/
+    function initMap(){
+        /*[# th:each="landmark : ${landmarkPositions}"]*/
+        var mapProp = {
+          center: new google.maps.LatLng(/*[[${landmark.latitude}]]*/, /*[[${landmark.longitude}]]*/),
+          zoom: 8
+        };
 
-  let map;
+        var map = new google.maps.Map(document.getElementById("map"),mapProp);
+    /*[/]*/
+    }
 
-  function myMap() {
+/*]]>*/
+  </script>
 
-    map = new google.maps.Map(document.getElementById("map"), {
-      center: { lat: -34.397, lng: 150.644 },
-      zoom: 8,
-    });
-  }
-  </script> -->
+  <script th:inline="javascript">
+     /*<![CDATA[*/
+
+    const googleSrc = /*[[${googleMapUrl}]]*/ 'default';
+    console.log(googleSrc);
+    const script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.src = googleSrc;
+    document.body.appendChild(script);
+
+  </script>
 
 </body>
 </html>

@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,8 +28,11 @@ import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.cloud.vision.v1.EntityAnnotation;
 import com.google.cloud.vision.v1.FaceAnnotation;
 import com.google.cloud.vision.v1.Feature;
+import com.google.cloud.vision.v1.LocationInfo;
 
 import vttp2022.ssf.ssf_miniproject.FileUploadUtil;
+import vttp2022.ssf.ssf_miniproject.models.Position;
+import vttp2022.ssf.ssf_miniproject.models.Role;
 import vttp2022.ssf.ssf_miniproject.models.User;
 import vttp2022.ssf.ssf_miniproject.services.UserService;
 
@@ -120,15 +124,23 @@ public class VisionController {
             }
 
             if (landmarkAnnotationResults != null){
+                List<Position> landmarkPositions = new ArrayList<>();
                 System.out.println("-------------");
                 for (EntityAnnotation ea : landmarkAnnotationResults){
-                    System.out.println(ea);
+                    List<LocationInfo> locationInfos = ea.getLocationsList();
+                    for (LocationInfo locationInfo : locationInfos){
+                       System.out.println(locationInfo);
+                       System.out.println(locationInfo.getLatLng());
+                       String googleMapInitialiseUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + locationInfo.getLatLng().getLatitude() + "," + locationInfo.getLatLng().getLongitude() + "&zoom=14&size=400x400&markers=size:mid%7Ccolor:red%7C" +locationInfo.getLatLng().getLatitude() + "," + locationInfo.getLatLng().getLongitude() + "&key="+ googleAPIKey;
+                       Position p = new Position(ea.getDescription(), ea.getScore(), locationInfo.getLatLng().getLatitude(), locationInfo.getLatLng().getLongitude(), googleMapInitialiseUrl);
+                       landmarkPositions.add(p);
+                    }
                 }
-                String googleMapUrl = "https://maps.googleapis.com/maps/api/js?key=" + googleAPIKey + "&callback=myMap";
-                System.out.println(googleMapUrl);
-                redirectAttributes.addFlashAttribute("googleMapUrl", googleMapUrl);
+                // System.out.println(googleMapInitialiseUrl);
+                // redirectAttributes.addFlashAttribute("googleMapUrl", googleMapInitialiseUrl);
                 redirectAttributes.addFlashAttribute("imagePath", "/" + uploadDir + "/" + uniqueImagePath);
                 redirectAttributes.addFlashAttribute("landmarkAnnotationResults", landmarkAnnotationResults);
+                 redirectAttributes.addFlashAttribute("landmarkPositions", landmarkPositions);
                 redirectAttributes.addFlashAttribute("message", "Image has been uploaded successfully and processed with Google Vision API.");
             }
             else if (labelAnnotationResults != null){

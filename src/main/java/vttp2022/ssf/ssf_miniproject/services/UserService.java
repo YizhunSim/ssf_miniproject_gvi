@@ -114,7 +114,7 @@ public class UserService {
         user.setPassword(encodedPassword);
     }
 
-    public boolean isEmailUnique(Integer id, String email){
+    public boolean isEmailUnique(String id, String email){
 //        System.out.println("UserService: isEmailUnique - id: " + id + " email: " + email);
         User userByEmail = userRepo.findFirstByEmail(email);
 //        System.out.println("UserService: isEmailUnique - userByEmail: " + userByEmail);
@@ -128,16 +128,16 @@ public class UserService {
                 return false;
             }
         }else{
-            if (Integer.parseInt(userByEmail.getId()) != id){
+            if (userByEmail.getId() != id){
                 return false;
             }
         }
         return true;
     }
 
-    public User get(Integer id) throws UserNotFoundException {
+    public User get(String id) throws UserNotFoundException {
         try{
-            return userRepo.findById(id.toString()).get();
+            return userRepo.findById(id).get();
         } catch(NoSuchElementException ex){
             throw new UserNotFoundException("Could not find any user with ID " + id);
         }
@@ -163,5 +163,10 @@ public class UserService {
         userRepo.deleteById(id);
     }
 
+    public void updateUserEnabledStatus(String id, boolean enabled){
+        User user = userRepo.findById(id).get();
+        user.setEnabled(enabled);
+        userRepo.save(user);
+    }
 
 }
