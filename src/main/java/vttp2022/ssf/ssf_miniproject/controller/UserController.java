@@ -21,6 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import vttp2022.ssf.ssf_miniproject.FileUploadUtil;
+import vttp2022.ssf.ssf_miniproject.export.UserCSVExporter;
+import vttp2022.ssf.ssf_miniproject.export.UserExcelExporter;
+import vttp2022.ssf.ssf_miniproject.export.UserPDFExporter;
 import vttp2022.ssf.ssf_miniproject.models.Role;
 import vttp2022.ssf.ssf_miniproject.models.User;
 import vttp2022.ssf.ssf_miniproject.services.UserNotFoundException;
@@ -160,25 +163,25 @@ public class UserController {
         return "redirect:/users";
     }
 
-    // @GetMapping("/users/export/csv")
-    // public void exportToCSV(HttpServletResponse response) throws IOException {
-    //     List<User> listUsers = userService.listAll();
-    //     UserCSVExporter exporter = new UserCSVExporter();
-    //     exporter.export(listUsers, response);
-    // }
+    @GetMapping("/users/export/csv")
+    public void exportToCSV(HttpServletResponse response) throws IOException {
+        List<User> listUsers = userService.listAll();
+        UserCSVExporter exporter = new UserCSVExporter();
+        exporter.export(listUsers, response);
+    }
 
-    // @GetMapping("/users/export/excel")
-    // public void exportToExcel(HttpServletResponse response) throws IOException {
-    //     List<User> listUsers = userService.listAll();
-    //     UserExcelExporter exporter = new UserExcelExporter();
-    //     exporter.export(listUsers, response);
-    // }
+    @GetMapping("/users/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        List<User> listUsers = userService.listAll();
+        UserExcelExporter exporter = new UserExcelExporter();
+        exporter.export(listUsers, response);
+    }
 
-    // @GetMapping("/users/export/pdf")
-    // public void exportToPdf(HttpServletResponse response) throws IOException {
-    //     List<User> listUsers = userService.listAll();
-    //     UserPDFExporter exporter = new UserPDFExporter();
-    //     exporter.export(listUsers, response);
-    // }
+    @GetMapping("/users/export/pdf")
+    public void exportToPdf(HttpServletResponse response) throws IOException {
+        List<User> listUsers = userService.listAll();
+        UserPDFExporter exporter = new UserPDFExporter();
+        exporter.export(listUsers, response);
+    }
   
 }
