@@ -117,9 +117,9 @@ public class UserService {
     }
 
     public boolean isEmailUnique(String id, String email){
-//        System.out.println("UserService: isEmailUnique - id: " + id + " email: " + email);
+    //    System.out.println("UserService: isEmailUnique - id: " + id + " email: " + email);
         User userByEmail = userRepo.findFirstByEmail(email);
-//        System.out.println("UserService: isEmailUnique - userByEmail: " + userByEmail);
+    //    System.out.println("UserService: isEmailUnique - userByEmail: " + userByEmail);
         if (userByEmail == null){
             return true;
         }
@@ -130,7 +130,7 @@ public class UserService {
                 return false;
             }
         }else{
-            if (userByEmail.getId() != id){
+            if (!userByEmail.getId().equals(id)){
                 return false;
             }
         }
